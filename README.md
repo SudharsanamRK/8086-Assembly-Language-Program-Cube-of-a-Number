@@ -1,101 +1,100 @@
-# 8086-Assembly-Language-Program-Cube-of-a-Number
+# 8086 Assembly Language Program – Cube of a Number 
 
-### Aim
-To write and execute an 8086 Assembly Language Program (ALP) to find the cube of a given number.
+## Aim
 
-### Apparatus Required
-- Personal Computer with DOSBox
-- MASM/TASM Assembler
-- 8086 Emulator Environment
+To write and execute an 8086 Assembly Language Program (ALP) that computes the cube of a number and stores the result in memory.
 
-### Algorithm
+## Apparatus Required
+
+* Personal Computer with DOSBox Emulator
+* MASM Assembler
+* 8086 Emulator/Execution Environment
+
+## Algorithm
+
 1. Start the program.
-2. Initialize the Data Segment.
-3. Display a message asking the user to enter a digit.
-4. Accept the digit input (0–9) from keyboard.
-5. Convert the ASCII input to its numeric equivalent.
-6. Multiply the number by itself twice to find the cube (n * n * n).
-7. Display the cube of the number.
-8. Exit the program.
+2. Initialize registers with the input number.
+3. Multiply the number by itself to get the square.
+4. Multiply the square by the original number to get the cube.
+5. Store the result at a predefined memory location (1200H).
+6. Exit the program.
+7. Verify the stored result using DEBUG.
 
-### Program Code
+## Flowchart
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/e9c26dd5-cbde-4ea8-ad0f-630bbd27e9f4" />
+
+
+
+## Program Code
+
 ```asm
-DATA SEGMENT
-    MSG1 DB 'Enter a digit (0-9): $'
-    MSG2 DB 0DH,0AH,'Cube = $'
-DATA ENDS
-
 CODE SEGMENT
-ASSUME CS:CODE, DS:DATA
+ASSUME CS:CODE, DS:CODE
+ORG 1000H
 
 START:
-    MOV AX, DATA
-    MOV DS, AX
-
-    LEA DX, MSG1
-    MOV AH, 09H
-    INT 21H
-
-    MOV AH, 01H
-    INT 21H
-    SUB AL, 30H       
-    MOV BL, AL
-
-    MOV AL, BL
-    MUL BL             
-    MUL BL            
-
-    LEA DX, MSG2
-    MOV AH, 09H
-    INT 21H
-
-    ADD AL, 30H
-    MOV DL, AL
-    MOV AH, 02H
-    INT 21H
-
-    MOV AH, 4CH
-    INT 21H
+   MOV AL, 03H       ; Load input number = 3
+   MOV BL, AL        ; Copy input into BL
+   MUL BL            ; AX = AL * BL = 3 * 3 = 9
+   MOV CX, AX        ; Save square in CX
+   MOV AX, CX        ; Reload AX = 9
+   MUL BL            ; AX = AX * BL = 9 * 3 = 27
+   MOV SI, 1200H     ; Set memory location
+   MOV [SI], AX      ; Store result low word at 1200H
+   MOV [SI+2], DX    ; Store high word at 1202H
+   MOV AH, 4CH       ; Exit program
+   INT 21H
 
 CODE ENDS
 END START
 ```
 
-### Flowchart didgram
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/99350be9-0ab1-4704-a7a7-5c1baa57ddbe" />
+## Execution Commands (in DOSBox)
 
-
-### Execution Commands (DOSBox)
 ```bash
 masm cubenum.asm;
 link cubenum.obj;
-cubenum.exe
-```
-### Manual Calculation
-
-Input: 3
-
-Steps:
-
-1. User enters ASCII '3' → convert to number: 3.
-2. Cube calculation:
-   ```nginx
-   num * num * num
-   3 * 3 * 3 = 27
-   ```
-3. Display:
-   ```ini
-   Cube = 27
-   ```
-
-### Sample Output
-```cpp
-Enter a digit (0-9): 2
-Cube = 8
+debug cubenum.exe
 ```
 
-### Ouput
-![8086-Cube-Program-Output](https://github.com/user-attachments/assets/e9eddba3-e947-4b0b-a17a-46df2ec705ee)
+Inside DEBUG:
 
-### Result
-Thus, the 8086 Assembly Language Program to find the cube of a number was executed successfully.
+* Run program from offset `1000H`:
+
+  ```
+  -g=1000
+  ```
+* Dump memory at `1200H` to check result:
+
+  ```
+  -d 1200
+  ```
+
+## Output
+<img width="629" height="200" alt="image" src="https://github.com/user-attachments/assets/e7b0fb8e-4295-4095-a7bd-bf65160807cf" />
+
+
+## Output Verification
+
+Memory dump after execution:
+
+```
+-d 1200
+075A:1200  1B 00 00 00 ...
+```
+
+* At **1200H**: `1B 00` → hexadecimal **001Bh**.
+* Decimal equivalent = **27**.
+* This confirms that the cube of `3` was correctly calculated and stored.
+
+## Sample Calculation
+
+**Input:** 3
+
+**Computation:** 3 × 3 × 3 = 27
+
+**Stored Result:** 001Bh (hexadecimal) at memory location 1200H.
+
+## Result
+
+Thus, the 8086 Assembly Language Program successfully computed the cube of a given number and stored the result in memory, verified using DEBUG.
